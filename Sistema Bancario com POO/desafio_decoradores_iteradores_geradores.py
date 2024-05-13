@@ -1,7 +1,8 @@
 '''
 Material do professor Guilherme Carvalho da trilha de python da DIO.
+Implementado por mim no exercício proposto.
 03 - Decoradores, Iteradores e Geradores/desafio/desafio_v1.py
-Disponível em: https://github.com/digitalinnovationone/trilha-python-dio/blob/main/03%20-%20Decoradores%2C%20Iteradores%20e%20Geradores/desafio/desafio_v1.py
+Exercício proposto disponível em: https://github.com/digitalinnovationone/trilha-python-dio/blob/main/03%20-%20Decoradores%2C%20Iteradores%20e%20Geradores/desafio/desafio_v1.py
 '''
 
 import textwrap
@@ -9,16 +10,22 @@ from abc import ABC, abstractclassmethod, abstractproperty
 from datetime import datetime
 
 
-class ContaIterador:
+class ContaIterador: # Iterator
     def __init__(self, contas):
-        pass
+        self.contas = contas
+        self._index = 0
 
     def __iter__(self):
-        pass
+        return self
 
     def __next__(self):
-        pass
-
+        try:
+            conta = self.contas[self._index]
+            return f'Agência: {conta.agencia}\nNúmero: {conta.numero}\nTitular: {conta.cliente.nome}\nSaldo: R${conta.saldo:.2f}'
+        except IndexError:
+            raise StopIteration
+        finally:
+            self._index += 1
 
 class Cliente:
     def __init__(self, endereco):
@@ -150,8 +157,10 @@ class Historico:
             }
         )
 
-    def gerar_relatorio(self, tipo_transacao=None):
-        pass
+    def gerar_relatorio(self, tipo_transacao=None): # Generator
+        for transacao in self._transacoes:
+            if tipo_transacao is None or transacao['tipo'].lower() == tipo_transacao.lower():
+                yield transacao
 
 
 class Transacao(ABC):
@@ -195,8 +204,14 @@ class Deposito(Transacao):
             conta.historico.adicionar_transacao(self)
 
 
-def log_transacao(func):
-    pass
+def log_transacao(func): # Decorator
+
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        print(f'{datetime.now} : {func.__name__.upper()}')
+        return result
+    
+    return wrapper
 
 
 def menu():
@@ -279,15 +294,15 @@ def exibir_extrato(clientes):
         return
 
     print("\n================ EXTRATO ================")
-    # TODO: atualizar a implementação para utilizar o gerador definido em Historico
-    transacoes = conta.historico.transacoes
 
     extrato = ""
-    if not transacoes:
-        extrato = "Não foram realizadas movimentações."
-    else:
-        for transacao in transacoes:
-            extrato += f"\n{transacao['tipo']}:\n\tR$ {transacao['valor']:.2f}"
+    tem_transacao = False
+    for transacao in conta.historico.gerar_relatorio(tipo_transacao = 'saque'):
+        tem_transacao = True
+        extrato += f'\n{transacao['tipo']}: R${transacao['valor']:.2f}'
+
+    if not tem_transacao:
+        extrato = 'Não foram realizadas movimentações'
 
     print(extrato)
     print(f"\nSaldo:\n\tR$ {conta.saldo:.2f}")
@@ -331,8 +346,8 @@ def criar_conta(numero_conta, clientes, contas):
 
 
 def listar_contas(contas):
-    # TODO: alterar implementação, para utilizar a classe ContaIterador
-    for conta in contas:
+    
+    for conta in ContaIterador(contas):
         print("=" * 100)
         print(textwrap.dedent(str(conta)))
 
