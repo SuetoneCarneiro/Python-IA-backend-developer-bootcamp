@@ -1,33 +1,46 @@
 # Classe UsuarioTelefone e o encapsulamento dos atributos nome, numero e plano:
 class UsuarioTelefone:
     def __init__(self, nome, numero, plano):
-        self.nome = nome
-        self.numero = numero
-        self.plano = plano
+        self._nome = nome
+        self._numero = numero
+        self._plano = plano
 
-# TODO: Crie um método fazer_chamada para permitir que um usuário faça uma chamada telefônica:
+    @property
+    def nome(self):
+        return self._nome
+    
+    @property
+    def numero(self):
+        return self._nome
+    
+    @property
+    def plano(self):
+        return self._plano
+    
+    def verificar_saldo(self):
+        return self.plano.saldo
 
-# TODO: Calcule o custo da chamada usando o método 'custo_chamada' do objeto 'plano':
+    def fazer_chamada(self, destinatario, duracao):
+        custo = self.plano.custo_chamada(duracao)
 
-# TODO: Verifique se o saldo do plano é suficiente para a chamada.
-
-# TODO: Se o saldo for suficiente, deduz o custo da chamada do saldo do plano.
-
-# TODO: E retorne uma mensagem de sucesso com o destinatário e o saldo restante após a chamada:
-
+        if custo > self.plano.saldo:
+            return 'Saldo insuficiente para fazer a chamada.'
+        else:
+            self.plano.deduzir_saldo(custo)
+            return f'Chamada para {destinatario} realizada com sucesso. Saldo: ${self.plano.saldo:.2f}'
 
 # Classe Pano, ela representa o plano de um usuário de telefone:
 class Plano:
+
     def __init__(self, saldo_inicial):
         self.saldo = saldo_inicial
-
-# TODO: Crie um método para verificar_saldo e retorne o saldo atual:
-
-# TODO: Crie um método custo_chamada para calcular o custo de uma chamada supondo o custo de $0.10 por minuto:
-
-
-# TODO: Crie um método deduzir_saldo para deduz o valor do saldo do plano:
-
+    
+    def custo_chamada(self, duracao):
+        custo = duracao*0.10
+        return custo
+    
+    def deduzir_saldo(self, custo):
+        self.saldo -= custo
 
 # Classe UsuarioPrePago, aqui vemos a herança onde UsuarioPrePago herda os atributos e métodos da classe UsuarioTelefone:
 class UsuarioPrePago(UsuarioTelefone):
