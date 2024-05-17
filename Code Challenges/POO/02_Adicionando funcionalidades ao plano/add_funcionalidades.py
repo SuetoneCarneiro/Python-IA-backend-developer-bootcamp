@@ -1,19 +1,34 @@
-# TODO: Crie a classe PlanoTelefone, seu método de inicialização e encapsule os atributos, 'nome' e 'saldo':
-
-
-# TODO: Crie um método 'verificar_saldo' para verificar o saldo do plano sem acessar diretamente o atributo:    
+class PlanoTelefone:
+    def __init__(self, nome, saldo):
+        self._nome = nome
+        self._saldo = saldo
     
-# TODO: Crie um método 'mensagem_personalizada' para gerar uma mensagem personalizada com base no saldo: 
+    @property
+    def nome(self):
+        return self._nome
     
-
+    @property
+    def saldo(self):
+        return self._saldo
+        
+    def mensagem_personalizada(self, saldo):
+        saldo = self.saldo
+        if saldo < 10:
+            return 'Seu saldo está baixo. Recarregue e use os serviços do seu plano.'
+        elif saldo >= 50:
+            return 'Parabéns! Continue aproveitando seu plano sem preocupações.'
+        else:
+            return 'Seu saldo está razoável. Aproveite o uso moderado do seu plano.'
+        
 # Classe UsuarioTelefone:
 class UsuarioTelefone:
-    def __init__(self, nome, plano):
+    def __init__(self, nome, plano: PlanoTelefone):
         self.nome = nome
         self.plano = plano
 
-# TODO: Crie um método para verificar o saldo do usuário e gerar uma mensagem personalizada:
- 
+    def verificar_saldo(self):
+        saldo_atual = self.plano.saldo
+        return saldo_atual, self.plano.mensagem_personalizada(saldo_atual)
 
 
 # Recebendo as entradas do usuário (nome, plano, saldo):
